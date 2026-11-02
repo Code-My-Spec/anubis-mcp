@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented in this file.
 
+## [2.2.1](https://github.com/zoedsoupe/anubis-mcp/compare/v2.2.0...v2.2.1) (2026-11-02)
+
+
+### Miscellaneous Chores
+
+* **nix:** migrate dev shell to beam-overlay ([a7a2462](https://github.com/zoedsoupe/anubis-mcp/commit/a7a2462db2bea48b45ee45a7b9295011c70e28fb))
+
 ## [2.2.0](https://github.com/zoedsoupe/anubis-mcp/compare/v2.1.0...v2.2.0) (2026-10-19)
 
 
