@@ -115,20 +115,19 @@ if Code.ensure_loaded?(Plug) do
       end
     end
 
+    # An unknown MCP-Protocol-Version header is logged, not refused: a client on a
+    # newer protocol sends it on `initialize` too, and refusing that request stops
+    # it from ever negotiating down to a version this server speaks.
     defp handle_request(conn, opts) do
-      case validate_protocol_version_header(conn, opts) do
-        :ok ->
-          case conn.method do
-            "GET" -> handle_get(conn, opts)
-            "POST" -> handle_post(conn, opts)
-            "DELETE" -> handle_delete(conn, opts)
-            _ -> send_error(conn, 405, "Method not allowed")
-          end
+      with {:error, version} <- validate_protocol_version_header(conn, opts) do
+        Logging.transport_event("unsupported_protocol_version", %{version: version}, level: :warning)
+      end
 
-        {:error, version} ->
-          Logging.transport_event("unsupported_protocol_version", %{version: version}, level: :warning)
-
-          send_error(conn, 400, "Unsupported MCP-Protocol-Version: #{version}")
+      case conn.method do
+        "GET" -> handle_get(conn, opts)
+        "POST" -> handle_post(conn, opts)
+        "DELETE" -> handle_delete(conn, opts)
+        _ -> send_error(conn, 405, "Method not allowed")
       end
     end
 

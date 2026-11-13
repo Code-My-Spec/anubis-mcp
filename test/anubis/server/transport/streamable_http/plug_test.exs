@@ -316,7 +316,9 @@ defmodule Anubis.Server.Transport.StreamableHTTP.PlugTest do
       assert body["error"]["code"] == -32_700
     end
 
-    test "POST request with unsupported MCP-Protocol-Version returns 400", %{
+    # A client on a newer protocol sends its version on every request, initialize
+    # included; refusing it would stop the client from negotiating down.
+    test "POST request with an unknown MCP-Protocol-Version is still served", %{
       opts: opts,
       test_session_id: session_id
     } do
@@ -329,11 +331,10 @@ defmodule Anubis.Server.Transport.StreamableHTTP.PlugTest do
         |> put_req_header("content-type", "application/json")
         |> put_req_header("accept", "application/json")
         |> put_req_header("mcp-session-id", session_id)
-        |> put_req_header("mcp-protocol-version", "1999-01-01")
+        |> put_req_header("mcp-protocol-version", "2026-07-28")
         |> StreamableHTTPPlug.call(opts)
 
-      assert conn.status == 400
-      assert conn.resp_body =~ "1999-01-01"
+      assert conn.status == 200
     end
 
     test "POST request with supported MCP-Protocol-Version succeeds", %{
